@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   ClearFunds — Semantic theme tokens
+   Light = soft blue-tinted system. Dark = calm command center.
+   ============================================================ */
+:root {
+  /* RGB triplets for tailwind <alpha-value> support */
+  --surface: 255 255 255;
+  --surface-2: 247 250 255;
+  --sidebar: 220 232 255;
+  --border: 219 230 250;
+  --text-primary: 15 23 42;
+  --text-secondary: 71 85 105;
+  --text-muted: 100 116 139;
+
+  /* Direct-use tokens */
+  --app-bg: linear-gradient(180deg, #edf4ff 0%, #e3eeff 100%);
+  --card-border: rgba(37, 99, 235, 0.06);
+  --card-shadow: 0 10px 30px rgba(37, 99, 235, 0.08);
+  --glow-color: rgba(37, 99, 235, 0.25);
+
+  /* Chart tokens */
+  --chart-bg: transparent;
+  --chart-grid: rgba(15, 23, 42, 0.06);
+  --chart-axis: #64748b;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: rgba(37, 99, 235, 0.12);
+}
+
+.dark {
+  --surface: 17 24 39; /* #111827 */
+  --surface-2: 22 32 51; /* #162033 */
+  --sidebar: 15 23 42; /* #0F172A */
+  --border: 30 41 59;
+  --text-primary: 241 245 249;
+  --text-secondary: 203 213 225;
+  --text-muted: 148 163 184;
+
+  --app-bg: linear-gradient(180deg, #0b1220 0%, #0e1628 100%);
+  --card-border: rgba(255, 255, 255, 0.06);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --glow-color: rgba(64, 214, 201, 0.3);
+
+  --chart-bg: transparent;
+  --chart-grid: rgba(255, 255, 255, 0.06);
+  --chart-axis: #94a3b8;
+  --chart-tooltip-bg: #182235;
+  --chart-tooltip-border: rgba(255, 255, 255, 0.08);
+}
+
+* {
+  border-color: rgb(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--app-bg);
+  background-attachment: fixed;
+  color: rgb(var(--text-primary));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ---- Reusable component classes ---- */
+@layer components {
+  .cf-card {
+    @apply rounded-2xl bg-surface;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+  }
+
+  .cf-input {
+    @apply w-full rounded-xl bg-surface-2 px-4 py-2.5 text-sm text-content
+      placeholder:text-content-muted outline-none transition;
+    border: 1px solid rgb(var(--border));
+  }
+  .cf-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+
+  .cf-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5
+      text-sm font-semibold transition active:scale-[0.98] disabled:opacity-50;
+  }
+  .cf-btn-primary {
+    @apply cf-btn text-white;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
+  }
+  .cf-btn-primary:hover {
+    filter: brightness(1.05);
+  }
+  .cf-btn-ghost {
+    @apply cf-btn bg-surface-2 text-content-secondary;
+    border: 1px solid rgb(var(--border));
+  }
+  .cf-btn-ghost:hover {
+    @apply text-content;
+    border-color: #2563eb;
+  }
+
+  .cf-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+  }
+
+  .cf-label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-content-muted;
+  }
+}
+
+/* ---- Dark mode: kill any white chart backgrounds ---- */
+.dark .recharts-wrapper,
+.dark .recharts-surface,
+.dark svg.recharts-surface {
+  background: transparent !important;
+}
+.recharts-default-tooltip {
+  background: var(--chart-tooltip-bg) !important;
+  border: 1px solid var(--chart-tooltip-border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--card-shadow) !important;
+  color: rgb(var(--text-primary)) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border));
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Animations */
+@keyframes cf-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.cf-fade-up {
+  animation: cf-fade-up 0.5s ease both;
+}
+@keyframes cf-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.cf-scale-in {
+  animation: cf-scale-in 0.18s ease both;
+}
