@@ -22,12 +22,23 @@ export default function Auth({ mode }: { mode: "signin" | "signup" }) {
 
   const isSignup = mode === "signup";
 
-  function handleSubmit(e: React.FormEvent) {
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim()) return;
-    if (isSignup) signUp(name.trim() || "ClearFunds User", email.trim());
-    else signIn(email.trim());
-    navigate("/app", { replace: true });
+    if (!email.trim() || submitting) return;
+    setError(null);
+    setSubmitting(true);
+    try {
+      if (isSignup) await signUp(name.trim() || "ClearFunds User", email.trim(), password);
+      else await signIn(email.trim(), password);
+      navigate("/app", { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Authentication failed. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -139,8 +150,18 @@ export default function Auth({ mode }: { mode: "signin" | "signup" }) {
                 </div>
               </div>
 
-              <button type="submit" className="cf-btn-primary w-full">
-                {isSignup ? "Create account" : "Sign in"}
+              {error && (
+                <p className="rounded-xl bg-expense/10 px-3 py-2 text-sm font-medium text-expense">
+                  {error}
+                </p>
+              )}
+
+              <button type="submit" disabled={submitting} className="cf-btn-primary w-full">
+                {submitting
+                  ? "Please wait…"
+                  : isSignup
+                    ? "Create account"
+                    : "Sign in"}
                 <ArrowRight size={16} />
               </button>
             </form>
