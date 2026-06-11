@@ -10,14 +10,17 @@
 //   - Supabase configured (prod)             -> supabase
 // ============================================================
 import { createLocalAdapter } from "./localAdapter";
-import { createSupabaseAdapter } from "./supabaseAdapter";
-import { isSupabaseConfigured } from "./supabaseClient";
+import { createLazySupabaseAdapter } from "./lazySupabaseAdapter";
+import { dataAdapterMode, isSupabaseConfigured } from "./env";
 import type { DataAdapter } from "./types";
 
+// Note: the Supabase adapter is loaded via a dynamic import inside the lazy
+// wrapper, so @supabase/supabase-js never enters the main bundle. This
+// selector only reads env flags (env.ts imports no SDK).
 function selectAdapter(): DataAdapter {
-  const mode = (import.meta.env.VITE_DATA_ADAPTER as string | undefined)?.toLowerCase();
-  if (mode === "local") return createLocalAdapter();
-  if (mode === "supabase" || isSupabaseConfigured) return createSupabaseAdapter();
+  if (dataAdapterMode === "local") return createLocalAdapter();
+  if (dataAdapterMode === "supabase" || isSupabaseConfigured)
+    return createLazySupabaseAdapter();
   return createLocalAdapter();
 }
 

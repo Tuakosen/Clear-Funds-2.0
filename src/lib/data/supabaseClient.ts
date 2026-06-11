@@ -5,12 +5,9 @@
 // the data, not the key.
 // ============================================================
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { supabaseUrl as url, supabaseAnonKey as anonKey, isSupabaseConfigured } from "./env";
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-
-/** True when the app is configured to run against Supabase. */
-export const isSupabaseConfigured = Boolean(url && anonKey);
+export { isSupabaseConfigured };
 
 let client: SupabaseClient | null = null;
 
