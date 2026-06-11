@@ -13,8 +13,14 @@ center (no harsh whites, no white chart boxes).
 - **React Router** for marketing + app routing
 - **Recharts** for the income/expenses, donut, and trend charts
 - **lucide-react** icons
-- **Mock backend** — `localStorage`-backed entities, all scoped by `user_id`
-  (drop-in replaceable with Base44 / a real API later). **No Supabase.**
+- **Swappable data layer** — a synchronous `DataAdapter` interface with two
+  implementations behind it, all scoped by `user_id`:
+  - **localStorage adapter** — the zero-config development default.
+  - **Supabase adapter** — production (Postgres + RLS + Realtime), auto-selected
+    when `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` are set.
+  The UI only imports from `src/lib/backend.ts`, so switching backends changes
+  **no components**. See [`docs/`](./docs) for the full free-tier deployment plan
+  (Supabase, Vercel, Plaid Sandbox, Stripe-later).
 
 ## Getting started
 
@@ -30,7 +36,10 @@ npm run lint     # tsc --noEmit
 
 ```
 src/
-  lib/            types, mock backend, seed data, finance math, categories, utils
+  lib/            types, seed data, finance math, categories, utils
+    backend.ts    public data surface (re-exports the active adapter)
+    data/         adapter layer: types, emitter, localAdapter, supabaseAdapter,
+                  supabaseClient, index (selector)
   context/        AuthContext (mock auth), ThemeContext (light/dark)
   hooks/          useData — live, user-scoped entity reads
   components/
@@ -65,7 +74,14 @@ src/
 
 ## Auth & backend
 
-This build ships with a **mock auth + localStorage backend** so it runs with zero
-configuration. New users are seeded with realistic demo data. The `db` interface in
-`src/lib/backend.ts` is intentionally thin so a Base44 / REST backend can replace it without
-touching the UI.
+Out of the box this runs with a **mock auth + localStorage adapter** — zero config,
+seeded with realistic demo data. To go independent on free-tier infrastructure,
+add Supabase env vars and the app switches to the **Supabase adapter** automatically
+(no component changes). Step-by-step guides:
+
+- [Free-tier architecture](./docs/architecture.md)
+- [Supabase schema](./supabase/schema.sql) & [RLS policies](./supabase/policies.sql)
+- [Supabase Auth integration](./docs/auth-integration.md)
+- [localStorage → Supabase migration](./docs/migration-localstorage-to-supabase.md)
+- [Plaid Sandbox integration](./docs/plaid-sandbox.md)
+- [Vercel deployment](./docs/vercel-deployment.md) & [env vars](./docs/environment-variables.md)
