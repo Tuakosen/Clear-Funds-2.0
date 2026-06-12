@@ -65,6 +65,23 @@ export interface UserInsight {
   generated_at: string;
 }
 
+// Real bank account synced from Plaid (stored in the `accounts` table).
+export interface BankAccount {
+  id: string;
+  user_id: string;
+  plaid_account_id: string;
+  item_id?: string;
+  name: string;
+  official_name?: string;
+  mask?: string;
+  type?: string; // Plaid: depository | investment | credit | loan
+  subtype?: string; // checking | savings | brokerage | ...
+  current_balance: number;
+  available_balance?: number;
+  currency?: string;
+  institution?: string;
+}
+
 export interface User {
   id: string;
   name: string;

@@ -5,6 +5,7 @@
 // never touches a single component.
 // ============================================================
 import type {
+  BankAccount,
   Budget,
   Subscription,
   Transaction,
@@ -12,7 +13,12 @@ import type {
   UserInsight,
 } from "../types";
 
-export type EntityName = "transactions" | "budgets" | "subscriptions" | "insights";
+export type EntityName =
+  | "transactions"
+  | "budgets"
+  | "subscriptions"
+  | "insights"
+  | "accounts";
 
 export interface WithId {
   id: string;
@@ -37,6 +43,7 @@ export interface DataAdapter {
   budgets: EntityCrud<Budget>;
   subscriptions: EntityCrud<Subscription>;
   insights: EntityCrud<UserInsight>;
+  accounts: EntityCrud<BankAccount>;
 
   /** Load the signed-in user's data into the read cache (no-op for local). */
   hydrate(userId: string): Promise<void>;

@@ -20,28 +20,16 @@ the Edge Function trust boundary.
 | `supabase/functions/plaid-sync-transactions/` | Pull transactions via `/transactions/sync`, upsert to `transactions` |
 | `supabase/functions/_shared/cors.ts` | Shared CORS + JSON helper |
 
-These are **skeletons** — deployable when you're ready, not invoked by the UI yet.
+These are **implemented** and wired to the UI (`ConnectBankButton` in the
+Dashboard Accounts card + Settings). Deploy them and set secrets to go live.
 
-## Extra table for Plaid items (add when you start)
+## Database (run `supabase/plaid.sql`)
 
-```sql
-create table if not exists public.plaid_items (
-  id           uuid primary key default gen_random_uuid(),
-  user_id      uuid not null references auth.users (id) on delete cascade,
-  item_id      text not null unique,
-  access_token text not null,          -- written only by service-role
-  institution  text,
-  sync_cursor  text,
-  created_at   timestamptz not null default now()
-);
-alter table public.plaid_items enable row level security;
-
--- Users may SEE that they linked an item, but never the access_token in practice
--- (the column is only written by the service-role key inside Edge Functions).
-create policy "plaid_items_select_own" on public.plaid_items
-  for select using (auth.uid() = user_id);
--- No client insert/update/delete policy → only Edge Functions (service role) write.
-```
+`supabase/plaid.sql` is idempotent and creates/aligns everything the functions
+need: `accounts`, `plaid_items` (RLS on, **no policies** → access_token is never
+client-readable), `plaid_transactions_sync_log`, the `plaid_transaction_id` /
+`account_id` columns on `transactions`, the unique constraints used by upserts,
+an `accounts_select_own` RLS policy, and Realtime on `accounts`.
 
 ## Setup steps
 

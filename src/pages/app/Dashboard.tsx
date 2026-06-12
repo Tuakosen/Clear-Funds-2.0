@@ -23,7 +23,8 @@ import {
   totalsForMonth,
   upcomingBills,
 } from "../../lib/finance";
-import { getAccounts, totalBalance } from "../../lib/accounts";
+import { resolveAccounts, sumBalance } from "../../lib/accounts";
+import { ConnectBankButton } from "../../components/plaid/ConnectBankButton";
 import {
   cn,
   formatCurrency,
@@ -42,14 +43,14 @@ const ACCOUNT_ICONS = {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { transactions, subscriptions } = useData();
+  const { transactions, subscriptions, accounts: bankAccounts } = useData();
   const month = monthKey();
 
   const totals = totalsForMonth(transactions, month);
   const series = monthlySeries(transactions, 6);
   const categorySlices = spendingByCategory(transactions, month);
-  const accounts = getAccounts(transactions);
-  const balance = totalBalance(transactions);
+  const accounts = resolveAccounts(bankAccounts, transactions);
+  const balance = sumBalance(accounts);
   const sts = safeToSpend(transactions, subscriptions, month);
   const bills = upcomingBills(subscriptions, 30).slice(0, 5);
   const firstName = user?.name?.split(" ")[0] ?? "there";
@@ -134,9 +135,14 @@ export default function Dashboard() {
           }
         >
           {accounts.length === 0 ? (
-            <div className="flex items-center gap-3 rounded-xl bg-surface-2 p-4 text-sm text-content-secondary">
-              <Building2 size={18} className="shrink-0 text-content-muted" />
-              Connect your accounts to see balances here.
+            <div className="rounded-xl bg-surface-2 p-5 text-center">
+              <Building2 size={24} className="mx-auto mb-2 text-content-muted" />
+              <p className="mb-4 text-sm text-content-secondary">
+                Connect your accounts to see balances here.
+              </p>
+              <div className="flex justify-center">
+                <ConnectBankButton />
+              </div>
             </div>
           ) : (
             <>

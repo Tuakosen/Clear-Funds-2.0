@@ -13,6 +13,7 @@
 // pass user_id explicitly for clarity and offline reasoning.
 // ============================================================
 import type {
+  BankAccount,
   Budget,
   Subscription,
   Transaction,
@@ -42,6 +43,7 @@ const MAPS: {
   budgets: TableMap<Budget>;
   subscriptions: TableMap<Subscription>;
   insights: TableMap<UserInsight>;
+  accounts: TableMap<BankAccount>;
 } = {
   transactions: {
     table: "transactions",
@@ -87,6 +89,12 @@ const MAPS: {
     toDb: (i) => prune(i),
     fromDb: (r) => r as unknown as UserInsight,
   },
+  // Accounts are written server-side (Edge Functions); the app reads them.
+  accounts: {
+    table: "accounts",
+    toDb: (a) => prune(a),
+    fromDb: (r) => r as unknown as BankAccount,
+  },
 };
 
 // Drop undefined values so partial updates don't null out columns.
@@ -101,7 +109,13 @@ function stripKeys(obj: object, keys: string[]): Record<string, unknown> {
   return out;
 }
 
-const ENTITIES: EntityName[] = ["transactions", "budgets", "subscriptions", "insights"];
+const ENTITIES: EntityName[] = [
+  "transactions",
+  "budgets",
+  "subscriptions",
+  "insights",
+  "accounts",
+];
 
 export function createSupabaseAdapter(): DataAdapter {
   const cache: Record<EntityName, WithId[]> = {
@@ -109,6 +123,7 @@ export function createSupabaseAdapter(): DataAdapter {
     budgets: [],
     subscriptions: [],
     insights: [],
+    accounts: [],
   };
   let currentUserId = "";
   let realtimeBound = false;
@@ -247,6 +262,7 @@ export function createSupabaseAdapter(): DataAdapter {
     budgets: crud<Budget>("budgets"),
     subscriptions: crud<Subscription>("subscriptions"),
     insights: crud<UserInsight>("insights"),
+    accounts: crud<BankAccount>("accounts"),
 
     async hydrate(userId) {
       currentUserId = userId;

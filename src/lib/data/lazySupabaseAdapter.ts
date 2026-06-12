@@ -13,6 +13,7 @@
 // (after ensureSeeded awaits the load), so behavior is unchanged.
 // ============================================================
 import type {
+  BankAccount,
   Budget,
   Subscription,
   Transaction,
@@ -89,6 +90,7 @@ export function createLazySupabaseAdapter(): DataAdapter {
     budgets: crud<Budget>("budgets"),
     subscriptions: crud<Subscription>("subscriptions"),
     insights: crud<UserInsight>("insights"),
+    accounts: crud<BankAccount>("accounts"),
 
     async hydrate(userId) {
       await (await load()).hydrate(userId);

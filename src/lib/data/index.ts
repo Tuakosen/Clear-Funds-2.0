@@ -34,6 +34,7 @@ export const db = {
   budgets: adapter.budgets,
   subscriptions: adapter.subscriptions,
   insights: adapter.insights,
+  accounts: adapter.accounts,
 };
 
 export const hydrate = adapter.hydrate.bind(adapter);

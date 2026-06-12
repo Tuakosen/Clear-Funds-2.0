@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { db, subscribe } from "../lib/backend";
 import { useAuth } from "../context/AuthContext";
-import type { Budget, Subscription, Transaction } from "../lib/types";
+import type { BankAccount, Budget, Subscription, Transaction } from "../lib/types";
 
 // Live, user-scoped data. Re-reads whenever the backend emits a change.
 export function useData() {
@@ -20,8 +20,9 @@ export function useData() {
   const transactions: Transaction[] = uid ? db.transactions.list(uid) : [];
   const budgets: Budget[] = uid ? db.budgets.list(uid) : [];
   const subscriptions: Subscription[] = uid ? db.subscriptions.list(uid) : [];
+  const accounts: BankAccount[] = uid ? db.accounts.list(uid) : [];
   /* eslint-enable react-hooks/exhaustive-deps */
   void version;
 
-  return { uid, transactions, budgets, subscriptions, refresh };
+  return { uid, transactions, budgets, subscriptions, accounts, refresh };
 }

@@ -5,6 +5,7 @@
 // mock backend so the app runs with zero configuration.
 // ============================================================
 import type {
+  BankAccount,
   Budget,
   Subscription,
   Transaction,
@@ -81,6 +82,7 @@ export function createLocalAdapter(): DataAdapter {
     budgets: crud<Budget>("budgets"),
     subscriptions: crud<Subscription>("subscriptions"),
     insights: crud<UserInsight>("insights"),
+    accounts: crud<BankAccount>("accounts"),
 
     async hydrate() {
       // Data already lives in localStorage; nothing to fetch.
@@ -98,7 +100,7 @@ export function createLocalAdapter(): DataAdapter {
 
     resetUserData(user: User) {
       localStorage.removeItem(`${PREFIX}.${user.id}.seeded`);
-      (["transactions", "budgets", "subscriptions", "insights"] as EntityName[]).forEach(
+      (["transactions", "budgets", "subscriptions", "insights", "accounts"] as EntityName[]).forEach(
         (e) => localStorage.removeItem(key(user.id, e)),
       );
       adapter.ensureSeeded(user);

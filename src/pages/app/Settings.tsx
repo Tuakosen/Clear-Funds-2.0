@@ -16,17 +16,19 @@ import { PageHeader } from "../../components/layout/PageHeader";
 import { SectionCard, Avatar, Pill } from "../../components/ui/widgets";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
+import { useData } from "../../hooks/useData";
 import { resetUserData } from "../../lib/backend";
+import { ConnectBankButton } from "../../components/plaid/ConnectBankButton";
 import { cn } from "../../lib/utils";
 
 export default function Settings() {
   const { user, updateUser } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { accounts } = useData();
+  const linkedCount = accounts.length;
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
   const [saved, setSaved] = useState(false);
-  const [plaidConnected, setPlaidConnected] = useState(false);
-
   function saveProfile() {
     updateUser({ name: name.trim() || user!.name });
     setSaved(true);
@@ -136,20 +138,18 @@ export default function Settings() {
               </span>
               <div className="flex-1">
                 <p className="text-sm font-bold text-content">
-                  Plaid {plaidConnected ? "connected" : "connection"}
+                  {linkedCount > 0 ? "Bank connected" : "Connect with Plaid"}
                 </p>
                 <p className="text-xs text-content-muted">
-                  {plaidConnected
-                    ? "3 accounts linked · read-only · last synced just now"
-                    : "Securely link your bank with read-only access. Placeholder for Plaid integration."}
+                  {linkedCount > 0
+                    ? `${linkedCount} account${linkedCount === 1 ? "" : "s"} linked · read-only`
+                    : "Securely link your bank with read-only access via Plaid (Sandbox)."}
                 </p>
               </div>
-              <button
-                className={plaidConnected ? "cf-btn-ghost" : "cf-btn-primary"}
-                onClick={() => setPlaidConnected((v) => !v)}
-              >
-                {plaidConnected ? "Disconnect" : "Connect bank"}
-              </button>
+              <ConnectBankButton
+                variant={linkedCount > 0 ? "ghost" : "primary"}
+                label={linkedCount > 0 ? "Add another" : "Connect bank"}
+              />
             </div>
             <p className="mt-3 flex items-center gap-1.5 text-xs text-content-muted">
               <ShieldCheck size={13} /> ClearFunds never sees your bank password and can't move money.
