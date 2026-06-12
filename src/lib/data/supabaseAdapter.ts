@@ -111,6 +111,9 @@ export function createSupabaseAdapter(): DataAdapter {
   };
   let currentUserId = "";
   let realtimeBound = false;
+  // Serializes concurrent ensureSeeded() calls (signup fires loadProfile twice:
+  // once from signUp() and once from onAuthStateChange) so we never double-seed.
+  let seedingInFlight: Promise<void> | null = null;
 
   const sb = () => getSupabase();
   const newId = () =>
@@ -251,16 +254,25 @@ export function createSupabaseAdapter(): DataAdapter {
     },
 
     async ensureSeeded(user: User) {
-      if (currentUserId !== user.id) await adapter.hydrate(user.id);
-      const empty =
-        cache.transactions.length === 0 &&
-        cache.budgets.length === 0 &&
-        cache.subscriptions.length === 0;
-      const seedingEnabled = import.meta.env.VITE_SEED_NEW_USERS !== "false";
-      if (!empty || !seedingEnabled) return;
-      adapter.transactions.replaceAll(user.id, seedTransactions(user.id));
-      adapter.budgets.replaceAll(user.id, seedBudgets(user.id));
-      adapter.subscriptions.replaceAll(user.id, seedSubscriptions(user.id));
+      // Dedupe overlapping calls so the same user is hydrated/seeded once.
+      if (seedingInFlight) return seedingInFlight;
+      seedingInFlight = (async () => {
+        if (currentUserId !== user.id) await adapter.hydrate(user.id);
+        const empty =
+          cache.transactions.length === 0 &&
+          cache.budgets.length === 0 &&
+          cache.subscriptions.length === 0;
+        const seedingEnabled = import.meta.env.VITE_SEED_NEW_USERS !== "false";
+        if (!empty || !seedingEnabled) return;
+        adapter.transactions.replaceAll(user.id, seedTransactions(user.id));
+        adapter.budgets.replaceAll(user.id, seedBudgets(user.id));
+        adapter.subscriptions.replaceAll(user.id, seedSubscriptions(user.id));
+      })();
+      try {
+        await seedingInFlight;
+      } finally {
+        seedingInFlight = null;
+      }
     },
 
     async resetUserData(user: User) {
