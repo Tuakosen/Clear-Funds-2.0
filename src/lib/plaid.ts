@@ -40,3 +40,11 @@ export async function syncTransactions(): Promise<SyncResult> {
   if (data?.error) throw new Error(data.error);
   return { imported: data?.imported ?? 0, accounts: data?.accounts ?? 0 };
 }
+
+export async function removeBank(itemId: string): Promise<void> {
+  const { data, error } = await (await client()).functions.invoke("plaid-remove-item", {
+    body: { item_id: itemId },
+  });
+  if (error) throw new Error(error.message);
+  if (data?.error) throw new Error(data.error);
+}

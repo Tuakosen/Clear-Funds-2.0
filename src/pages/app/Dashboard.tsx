@@ -24,7 +24,9 @@ import {
   upcomingBills,
 } from "../../lib/finance";
 import { resolveAccounts, sumBalance } from "../../lib/accounts";
+import { seedDemoData } from "../../lib/data/env";
 import { ConnectBankButton } from "../../components/plaid/ConnectBankButton";
+import { SyncNowButton } from "../../components/plaid/SyncNowButton";
 import {
   cn,
   formatCurrency,
@@ -129,9 +131,13 @@ export default function Dashboard() {
         <SectionCard
           title="Accounts"
           action={
-            <Pill tone="brand">
-              <ShieldCheck size={12} /> Read-only
-            </Pill>
+            accounts.length > 0 && !seedDemoData ? (
+              <SyncNowButton compact />
+            ) : (
+              <Pill tone="brand">
+                <ShieldCheck size={12} /> Read-only
+              </Pill>
+            )
           }
         >
           {accounts.length === 0 ? (

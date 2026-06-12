@@ -33,6 +33,7 @@ alter table public.accounts add column if not exists current_balance numeric(14,
 alter table public.accounts add column if not exists available_balance numeric(14,2);
 alter table public.accounts add column if not exists currency text default 'USD';
 alter table public.accounts add column if not exists institution text;
+alter table public.accounts add column if not exists last_synced_at timestamptz;
 
 -- ---------- plaid_items (access_token never leaves the server) ----------
 create table if not exists public.plaid_items (

@@ -138,6 +138,13 @@ Deno.serve(async (req) => {
           accountsTouched++;
         }
       }
+
+      // Stamp last-synced time on this item's accounts (drives the UI).
+      await admin
+        .from("accounts")
+        .update({ last_synced_at: new Date().toISOString() })
+        .eq("user_id", user.id)
+        .eq("item_id", item.item_id);
     }
 
     // Best-effort sync log (table is optional).

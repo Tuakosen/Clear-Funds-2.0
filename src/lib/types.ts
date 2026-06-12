@@ -80,6 +80,7 @@ export interface BankAccount {
   available_balance?: number;
   currency?: string;
   institution?: string;
+  last_synced_at?: string;
 }
 
 export interface User {
