@@ -30,6 +30,7 @@ import {
   totalsForMonth,
 } from "../../lib/finance";
 import { getCategory } from "../../lib/categories";
+import { seedDemoData } from "../../lib/data/env";
 import {
   cn,
   formatCurrency,
@@ -100,12 +101,14 @@ export default function Insights() {
     return out.sort((a, b) => b.amount - a.amount).slice(0, 4);
   }, [transactions, month]);
 
-  // Savings goals (mock targets, progress from savings rate / net).
-  const goals = [
-    { name: "Emergency Fund", target: 10000, saved: 6800, color: "#40D6C9" },
-    { name: "Vacation 2026", target: 3500, saved: 1450, color: "#8B5CF6" },
-    { name: "New Laptop", target: 2200, saved: 1980, color: "#2563EB" },
-  ];
+  // Savings goals — demo targets only; real users start with none.
+  const goals = seedDemoData
+    ? [
+        { name: "Emergency Fund", target: 10000, saved: 6800, color: "#40D6C9" },
+        { name: "Vacation 2026", target: 3500, saved: 1450, color: "#8B5CF6" },
+        { name: "New Laptop", target: 2200, saved: 1980, color: "#2563EB" },
+      ]
+    : [];
 
   const incomeDelta = pctChange(cur.income, last.income);
   const expenseDelta = pctChange(cur.expenses, last.expenses);
@@ -251,6 +254,11 @@ export default function Insights() {
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Savings goals */}
         <SectionCard title="Savings Goals" action={<Pill tone="brand"><Target size={12} /> {goals.length} active</Pill>}>
+          {goals.length === 0 ? (
+            <p className="text-sm text-content-muted">
+              No savings goals yet. Create one to start tracking progress.
+            </p>
+          ) : (
           <ul className="space-y-4">
             {goals.map((g) => {
               const pct = Math.round((g.saved / g.target) * 100);
@@ -268,6 +276,7 @@ export default function Insights() {
               );
             })}
           </ul>
+          )}
         </SectionCard>
 
         {/* Subscriptions summary + anomalies */}

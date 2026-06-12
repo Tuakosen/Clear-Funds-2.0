@@ -21,6 +21,7 @@ import type {
 } from "../types";
 import { seedBudgets, seedSubscriptions, seedTransactions } from "../seed";
 import { emit } from "./emitter";
+import { seedDemoData } from "./env";
 import { getSupabase } from "./supabaseClient";
 import type { DataAdapter, EntityCrud, EntityName, WithId } from "./types";
 
@@ -258,12 +259,14 @@ export function createSupabaseAdapter(): DataAdapter {
       if (seedingInFlight) return seedingInFlight;
       seedingInFlight = (async () => {
         if (currentUserId !== user.id) await adapter.hydrate(user.id);
+        // Real Supabase users start empty. Demo seeding is opt-in only
+        // (local/mock mode, or VITE_SEED_NEW_USERS="true").
+        if (!seedDemoData) return;
         const empty =
           cache.transactions.length === 0 &&
           cache.budgets.length === 0 &&
           cache.subscriptions.length === 0;
-        const seedingEnabled = import.meta.env.VITE_SEED_NEW_USERS !== "false";
-        if (!empty || !seedingEnabled) return;
+        if (!empty) return;
         adapter.transactions.replaceAll(user.id, seedTransactions(user.id));
         adapter.budgets.replaceAll(user.id, seedBudgets(user.id));
         adapter.subscriptions.replaceAll(user.id, seedSubscriptions(user.id));

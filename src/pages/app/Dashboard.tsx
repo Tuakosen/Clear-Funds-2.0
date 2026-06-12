@@ -133,39 +133,48 @@ export default function Dashboard() {
             </Pill>
           }
         >
-          <ul className="space-y-3">
-            {accounts.map((acct) => {
-              const Icon = ACCOUNT_ICONS[acct.type];
-              return (
-                <li
-                  key={acct.name}
-                  className="flex items-center gap-4 rounded-xl bg-surface-2 p-3.5"
-                >
-                  <span
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-                    style={{ background: `${acct.accent}1f`, color: acct.accent }}
-                  >
-                    <Icon size={20} />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-content">{acct.name}</p>
-                    <p className="truncate text-xs text-content-muted">{acct.institution}</p>
-                  </div>
-                  <span className="shrink-0 whitespace-nowrap text-base font-extrabold tabular-nums text-content">
-                    {formatCurrency(acct.balance)}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="mt-4 flex items-center justify-between rounded-xl border border-dashed border-border px-4 py-3">
-            <span className="text-sm font-semibold text-content-secondary">
-              Total balance
-            </span>
-            <span className="text-base font-extrabold text-content">
-              {formatCurrency(balance)}
-            </span>
-          </div>
+          {accounts.length === 0 ? (
+            <div className="flex items-center gap-3 rounded-xl bg-surface-2 p-4 text-sm text-content-secondary">
+              <Building2 size={18} className="shrink-0 text-content-muted" />
+              Connect your accounts to see balances here.
+            </div>
+          ) : (
+            <>
+              <ul className="space-y-3">
+                {accounts.map((acct) => {
+                  const Icon = ACCOUNT_ICONS[acct.type];
+                  return (
+                    <li
+                      key={acct.name}
+                      className="flex items-center gap-4 rounded-xl bg-surface-2 p-3.5"
+                    >
+                      <span
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                        style={{ background: `${acct.accent}1f`, color: acct.accent }}
+                      >
+                        <Icon size={20} />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold text-content">{acct.name}</p>
+                        <p className="truncate text-xs text-content-muted">{acct.institution}</p>
+                      </div>
+                      <span className="shrink-0 whitespace-nowrap text-base font-extrabold tabular-nums text-content">
+                        {formatCurrency(acct.balance)}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mt-4 flex items-center justify-between rounded-xl border border-dashed border-border px-4 py-3">
+                <span className="text-sm font-semibold text-content-secondary">
+                  Total balance
+                </span>
+                <span className="text-base font-extrabold text-content">
+                  {formatCurrency(balance)}
+                </span>
+              </div>
+            </>
+          )}
         </SectionCard>
 
         {/* Upcoming Bills */}

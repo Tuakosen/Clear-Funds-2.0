@@ -1,5 +1,6 @@
 import type { Transaction } from "./types";
 import { totalsAll } from "./finance";
+import { seedDemoData } from "./data/env";
 
 export interface Account {
   name: string;
@@ -9,9 +10,11 @@ export interface Account {
   accent: string;
 }
 
-// Mock Plaid-style balances. Checking is nudged by overall net activity so the
-// dashboard feels connected to the user's transactions. NO credit card here.
+// Demo Plaid-style balances, shown ONLY in demo/development mode. Real Supabase
+// users start with no accounts (empty) until real balances are connected — so
+// the dashboard reads $0.00 instead of fake demo balances. NO credit card here.
 export function getAccounts(transactions: Transaction[]): Account[] {
+  if (!seedDemoData) return [];
   const { net } = totalsAll(transactions);
   const checkingBase = 4280;
   return [

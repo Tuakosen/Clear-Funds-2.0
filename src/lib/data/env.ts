@@ -14,3 +14,19 @@ export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 export const dataAdapterMode = (
   import.meta.env.VITE_DATA_ADAPTER ?? ""
 ).toLowerCase();
+
+/** True when the live data backend is Supabase (mirrors the selector logic). */
+export const usesSupabase =
+  dataAdapterMode !== "local" &&
+  (dataAdapterMode === "supabase" || isSupabaseConfigured);
+
+/**
+ * Whether to use demo/seed data (transactions, budgets, subscriptions, and the
+ * mock Accounts card). Real Supabase users start completely empty by default.
+ * Demo data is only enabled when:
+ *   - the local/mock adapter is active (development), or
+ *   - VITE_SEED_NEW_USERS="true" is set explicitly.
+ * In production (Supabase) the default is OFF — no env var required.
+ */
+export const seedDemoData =
+  !usesSupabase || import.meta.env.VITE_SEED_NEW_USERS === "true";
