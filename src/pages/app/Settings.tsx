@@ -28,7 +28,7 @@ export default function Settings() {
   const [plaidConnected, setPlaidConnected] = useState(false);
 
   function saveProfile() {
-    updateUser({ name: name.trim() || user!.name, email: email.trim() });
+    updateUser({ name: name.trim() || user!.name });
     setSaved(true);
     setTimeout(() => setSaved(false), 1800);
   }
@@ -57,7 +57,12 @@ export default function Settings() {
               </div>
               <div>
                 <label className="cf-label">Email</label>
-                <input className="cf-input" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input
+                  className="cf-input cursor-not-allowed opacity-70"
+                  value={email}
+                  readOnly
+                  title="Email is tied to your sign-in and can't be changed here."
+                />
               </div>
             </div>
             <div className="mt-4 flex items-center gap-3">
